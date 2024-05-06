@@ -85,6 +85,9 @@ class Printer:
         for var in range(len(result[0])):
             ax.plot(time, result[:, var])
         plt.title(f.__name__.title())
+        ticks = np.linspace(0, len(result), 5)
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(ticks/100)
         if saveName is not None:
             plt.savefig("Images/" + saveName + " signal.png")
         else:
@@ -105,3 +108,14 @@ class Printer:
         else:
             plt.show()
         plt.close(fig)
+
+        # 3d signal dependancy plot
+        if len(indexComb) == 3:
+            fig = plt.figure()
+            ax = plt.axes(projection='3d')
+            ax.plot3D(*result.T, 'blue')
+            if saveName is not None:
+                plt.savefig("Images/" + saveName + " dependency3D.png")
+            else:
+                plt.show()
+            plt.close(fig)
