@@ -76,7 +76,7 @@ class ODEINTMethod:
 
 class Printer:
     @staticmethod
-    def print(f, params):
+    def print(f, params, saveName=None):
         result = f(*params)
 
         # signal plot
@@ -84,7 +84,12 @@ class Printer:
         fig, ax = plt.subplots()
         for var in range(len(result[0])):
             ax.plot(time, result[:, var])
-        plt.show()
+        plt.title(f.__name__.title())
+        if saveName is not None:
+            plt.savefig("Images/" + saveName + " signal.png")
+        else:
+            plt.show()
+        plt.close(fig)
 
         # signal dependency plot
         indexLst = [var for var in range(len(result[1]))]
@@ -95,4 +100,8 @@ class Printer:
         else:
             for var in range(len(indexComb)):
                 ax[var].plot(result[:, indexComb[var][0]], result[:, indexComb[var][1]])
-        plt.show()
+        if saveName is not None:
+            plt.savefig("Images/" + saveName + " dependency.png")
+        else:
+            plt.show()
+        plt.close(fig)
