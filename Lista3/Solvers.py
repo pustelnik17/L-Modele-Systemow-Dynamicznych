@@ -1,37 +1,54 @@
-from typing import Union, Any
 import numpy as np
 from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+
 
 class EulerMethod:
     @staticmethod
-    def lorentz(dt: float, T: float,  x: float, y: float, z: float, s: float, b: float, p: float):
-        xVec, yVec, zVec = [x], [y], [z]
-        for step in range(int(T / dt)):
-            xVec.append(xVec[step] + s*(yVec[step] - xVec[step]))
-            yVec.append(yVec[step] + xVec[step]*(p - xVec[step]) - yVec[step])
-            zVec.append(zVec[step] + xVec[step]*yVec[step] - b*zVec[step])
-        return xVec, yVec, zVec
+    def lorentz(dt: float, t: float, x0: float, y0: float, z0: float, sigma: float, beta: float, rho: float):
+        def _lorentz(state):
+            x, y, z = state
+            dx = sigma * (y - x)
+            dy = rho * x - y - x * z
+            dz = x * y - beta * z
+            return np.array([dx, dy, dz])
+
+        num_steps = int(t / dt)
+
+        states = np.empty((num_steps + 1, 3))
+        states[0] = (x0, y0, z0)
+        for i in range(num_steps):
+            states[i + 1] = states[i] + _lorentz(states[i]) * dt
+        return states
 
     @staticmethod
-    def lotkaVolterra(dt: float, T: float, x: float, y: float, a: float, b: float, c: float, d: float)\
-            -> tuple[list[Union[float, Any]], list[Union[float, Any]]]:
-        prey, predators = [x], [y]
-        for step in range(int(T/dt)):
-            prey.append(prey[step] + (a - b * predators[step]) * prey[step] * dt)
-            predators.append(predators[step] + (c * prey[step] - d) * predators[step] * dt)
-        return prey, predators
+    def lotkaVolterra(dt: float, t: float, x0: float, y0: float, a: float, b: float, c: float, d: float):
+        def _lotkaVolterra(state):
+            x, y = state
 
+            dx = (a - b * y) * x
+            dy = (c * x - d) * y
+
+            return np.array([dx, dy])
+
+        num_steps = int(t / dt)
+
+        states = np.empty((num_steps + 1, 3))
+        states[0] = (x0, y0)
+        for i in range(num_steps):
+            states[i + 1] = states[i] + _lotkaVolterra(states[i]) * dt
+        return states
 
 class ODEINTMethod:
 
     @staticmethod
     def lorentz(dt: float, t: float, x0: float, y0: float, z0: float, sigma: float, beta: float, rho: float):
-        def _lorenz(state, t, sigma, beta, rho):
+        def _lorenz(state, _t, _sigma, _beta, _rho):
             x, y, z = state
 
-            dx = sigma * (y - x)
-            dy = x * (rho - z) - y
-            dz = x * y - beta * z
+            dx = _sigma * (y - x)
+            dy = x * (_rho - z) - y
+            dz = x * y - _beta * z
 
             return [dx, dy, dz]
 
@@ -42,11 +59,11 @@ class ODEINTMethod:
 
     @staticmethod
     def lotkaVolterra(dt: float, t: float, x0: float, y0: float, a: float, b: float, c: float, d: float):
-        def _lotkaVolterra(state, t, a, b, c, d) -> list:
+        def _lotkaVolterra(state, _t, _a, _b, _c, _d) -> list:
             x, y = state
 
-            dx = (a-b*y)*x
-            dy = (c*x-d)*y
+            dx = (_a - _b * y) * x
+            dy = (_c * x - _d) * y
 
             return [dx, dy]
 
@@ -54,3 +71,28 @@ class ODEINTMethod:
         time = np.arange(0.0, t, dt)
         param = (a, b, c, d)
         return odeint(_lotkaVolterra, args, time, param)
+
+
+class Printer:
+    @staticmethod
+    def print(f, params):
+        result = f(*params)
+        if f == ODEINTMethod.lorentz or f == EulerMethod.lorentz:
+            fig, ax = plt.subplots(1, 3)
+            ax[0].plot(result[:, 0], result[:, 1])
+            ax[1].plot(result[:, 1], result[:, 2])
+            ax[2].plot(result[:, 2], result[:, 0])
+            plt.show()
+
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1, projection='3d')
+            ax.plot(result[:, 0],
+                    result[:, 1],
+                    result[:, 2])
+        # else:
+        #     num_steps = int(params[1] / params[0])
+        #     fig, ax = plt.subplots(1, 1)
+        #     ax[0].plot(result[:, 0], result[:, 0])
+        #     ax[0].plot(result[:, 1], result[:, 1])
+        #     plt.show()
+        plt.show()
