@@ -89,7 +89,7 @@ class Printer:
         ax.set_xticks(ticks)
         ax.set_xticklabels(ticks/100)
         if saveName is not None:
-            plt.savefig("Images/" + saveName + " signal.png")
+            plt.savefig("Images/" + saveName + f"/signal/{params[0]}.png")
         else:
             plt.show()
         plt.close(fig)
@@ -99,12 +99,12 @@ class Printer:
         indexComb = list(itertools.combinations(indexLst, 2))
         fig, ax = plt.subplots(1, len(indexComb))
         if len(indexComb) == 1:
-            ax.plot(result[:, indexComb[0][0]], result[:, indexComb[0][1]])
+            ax.plot(result[:, indexComb[0][0]], result[:, indexComb[0][1]], 'blue')
         else:
             for var in range(len(indexComb)):
-                ax[var].plot(result[:, indexComb[var][0]], result[:, indexComb[var][1]])
+                ax[var].plot(result[:, indexComb[var][0]], result[:, indexComb[var][1]], 'blue')
         if saveName is not None:
-            plt.savefig("Images/" + saveName + " dependency.png")
+            plt.savefig("Images/" + saveName + f"/dependency/{params[0]}.png")
         else:
             plt.show()
         plt.close(fig)
@@ -115,7 +115,7 @@ class Printer:
             ax = plt.axes(projection='3d')
             ax.plot3D(*result.T, 'blue')
             if saveName is not None:
-                plt.savefig("Images/" + saveName + " dependency3D.png")
+                plt.savefig("Images/" + saveName + f"/3d/{params[0]}.png")
             else:
                 plt.show()
             plt.close(fig)
