@@ -84,7 +84,7 @@ class Printer:
         fig, ax = plt.subplots()
         for var in range(len(result[0])):
             ax.plot(time, result[:, var])
-        plt.title(f.__name__.title())
+        plt.title(f.__name__.title() + f"  dt={params[0]}")
         ticks = np.linspace(0, len(result), 5)
         ax.set_xticks(ticks)
         ax.set_xticklabels(ticks/100)
