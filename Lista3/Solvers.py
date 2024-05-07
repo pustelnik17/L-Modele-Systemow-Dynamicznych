@@ -16,9 +16,9 @@ class EulerMethod:
 
         num_steps = int(t / dt)
 
-        states = np.empty((num_steps + 1, 3))
+        states = np.empty((num_steps, 3))
         states[0] = (x0, y0, z0)
-        for i in range(num_steps):
+        for i in range(num_steps-1):
             states[i + 1] = states[i] + _lorentz(states[i]) * dt
         return states
 
@@ -34,11 +34,12 @@ class EulerMethod:
 
         num_steps = int(t / dt)
 
-        states = np.empty((num_steps + 1, 2))
+        states = np.empty((num_steps, 2))
         states[0] = (x0, y0)
-        for i in range(num_steps):
+        for i in range(num_steps-1):
             states[i + 1] = states[i] + _lotkaVolterra(states[i]) * dt
         return states
+
 
 class ODEINTMethod:
 
@@ -87,7 +88,7 @@ class Printer:
         plt.title(f.__name__.title() + f"  dt={params[0]}")
         ticks = np.linspace(0, len(result), 5)
         ax.set_xticks(ticks)
-        ax.set_xticklabels(ticks/100)
+        ax.set_xticklabels(np.round(ticks / (1 / params[0])))
         if saveName is not None:
             plt.savefig("Images/" + saveName + f"/signal/{params[0]}.png")
         else:
@@ -98,11 +99,13 @@ class Printer:
         indexLst = [var for var in range(len(result[1]))]
         indexComb = list(itertools.combinations(indexLst, 2))
         fig, ax = plt.subplots(1, len(indexComb))
+        st = fig.suptitle(f.__name__.title() + f"  dt={params[0]}", fontsize="x-large")
         if len(indexComb) == 1:
             ax.plot(result[:, indexComb[0][0]], result[:, indexComb[0][1]], 'blue')
         else:
             for var in range(len(indexComb)):
                 ax[var].plot(result[:, indexComb[var][0]], result[:, indexComb[var][1]], 'blue')
+        st.set_y(0.95)
         if saveName is not None:
             plt.savefig("Images/" + saveName + f"/dependency/{params[0]}.png")
         else:
@@ -112,10 +115,22 @@ class Printer:
         # 3d signal dependancy plot
         if len(indexComb) == 3:
             fig = plt.figure()
+            st = fig.suptitle(f.__name__.title() + f"  dt={params[0]}", fontsize="x-large")
             ax = plt.axes(projection='3d')
             ax.plot3D(*result.T, 'blue')
+            st.set_y(0.95)
             if saveName is not None:
                 plt.savefig("Images/" + saveName + f"/3d/{params[0]}.png")
             else:
                 plt.show()
             plt.close(fig)
+
+    @staticmethod
+    def MSE(f1, f2, params):
+        x = [f1(*params), f2(*params)]
+        n = len(x[0])
+        mse = 0
+        for i in range(n):
+            mse += pow(x[0][i] - x[1][i], exp=2)
+        mse /= n
+        print(mse)
