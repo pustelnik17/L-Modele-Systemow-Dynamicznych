@@ -20,6 +20,7 @@ class Object:
     def getVel(self):
         return self.vel
 
+
 class Solver:
     @staticmethod
     def nBodyProblem(objects: list):
