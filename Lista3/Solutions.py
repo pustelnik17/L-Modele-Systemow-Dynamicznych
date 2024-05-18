@@ -29,5 +29,5 @@ def mse():
     _mse(0.02)
 
 
-# draw()
-mse()
+draw()
+# mse()
