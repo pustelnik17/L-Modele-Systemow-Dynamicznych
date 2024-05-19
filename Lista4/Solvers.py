@@ -6,8 +6,6 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
 
-
-
 class DynamicModel:
     class SympySolver:
         @staticmethod
@@ -17,14 +15,15 @@ class DynamicModel:
             i = sp.Function('i')(t)
 
             eq1 = sp.Eq(q.diff(t), i)
-            eq2 = sp.Eq(L * i.diff(t) + R * i + q / C, A*sp.cos(Omega*t))
+            eq2 = sp.Eq(L * i.diff(t) + R * i + q / C, A * sp.cos(Omega * t))
 
             solution = sp.dsolve((eq1, eq2), ics={q.subs(t, 0): q0, i.subs(t, 0): i0})
 
             return solution
 
         @staticmethod
-        def simulate(q0: float, i0: float, R: float, L: float, C: float, A: float, Omega: float, dt: float, time: float):
+        def simulate(q0: float, i0: float, R: float, L: float, C: float, A: float, Omega: float, dt: float,
+                     time: float):
             equations: list[sp.Eq] = DynamicModel.SympySolver.RLC(q0, i0, R, C, L, A, Omega)
             numberOfSteps = int(time / dt)
             systemEvolution = []
@@ -37,7 +36,8 @@ class DynamicModel:
 
     class OdeIntSolver:
         @staticmethod
-        def simulate(q0: float, i0: float, R: float, L: float, C: float, A: float, Omega: float, dt: float, time: float):
+        def simulate(q0: float, i0: float, R: float, L: float, C: float, A: float, Omega: float, dt: float,
+                     time: float):
             def _V(_t, a: float, omega: float):
                 return a * np.cos(omega * _t)
 
@@ -45,7 +45,7 @@ class DynamicModel:
                 q, i = y
 
                 dqdt = i
-                didt = (1/_L) * (_V(_t, A, Omega) - _R*i - q/_C)
+                didt = (1 / _L) * (_V(_t, A, Omega) - _R * i - q / _C)
 
                 return [dqdt, didt]
 
