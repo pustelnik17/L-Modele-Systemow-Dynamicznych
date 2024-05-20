@@ -54,6 +54,17 @@ class DynamicModel:
             solution = odeint(_RLC, y0, t, args=(R, L, C))
             return solution.T
 
+    class ErrorCalculator:
+        @staticmethod
+        def MAE(tseries1, tseries2):
+            return (sum(abs(tseries1[0] - tseries2[0])) / len(tseries1) + sum(abs(tseries1[1] - tseries2[1])) /
+                    len(tseries1))
+
+        @staticmethod
+        def MSE(tseries1, tseries2):
+            return (sum((tseries1[0] - tseries2[0]) ** 2) / len(tseries1) + sum(abs(tseries1[1] - tseries2[1])) /
+                    len(tseries1))
+
 
 class Printer:
     @staticmethod
