@@ -57,20 +57,44 @@ class DynamicModel:
     class ErrorCalculator:
         @staticmethod
         def MAE(tseries1, tseries2):
-            return (sum(abs(tseries1[0] - tseries2[0])) / len(tseries1) + sum(abs(tseries1[1] - tseries2[1])) /
-                    len(tseries1))
+            return ((sum(abs(tseries1[0] - tseries2[0])) / len(tseries1) +
+                     sum(abs(tseries1[1] - tseries2[1])) / len(tseries1))
+                    .evalf(5))
+
+        @staticmethod
+        def MAEplot(tseries1, tseries2):
+            result = []
+            for i in range(len(tseries1[0])):
+                result.append(abs(tseries1[0][i] - tseries2[0][i]).evalf(3))
+            for i in range(1, len(tseries1[0])):
+                result[i] += result[i - 1]
+            for i in range(1, len(tseries1[0])):
+                result[i] /= i
+            return result
 
         @staticmethod
         def MSE(tseries1, tseries2):
-            return (sum((tseries1[0] - tseries2[0]) ** 2) / len(tseries1) + sum(abs(tseries1[1] - tseries2[1])) /
-                    len(tseries1))
+            return ((sum((tseries1[0] - tseries2[0]) ** 2) / len(tseries1) +
+                     sum((tseries1[1] - tseries2[1]) ** 2) / len(tseries1))
+                    .evalf(5))
+
+        @staticmethod
+        def MSEplot(tseries1, tseries2):
+            result = []
+            for i in range(len(tseries1[0])):
+                result.append(((tseries1[0][i] - tseries2[0][i]) ** 2).evalf(3))
+            for i in range(1, len(tseries1[0])):
+                result[i] += result[i - 1]
+            for i in range(1, len(tseries1[0])):
+                result[i] /= i
+            return result
 
 
 class Printer:
     @staticmethod
-    def print(systemEvolution1, systemEvolution2):
+    def print(systemEvolution1, systemEvolution2, dt):
         fig, ax = plt.subplots(1, 2)
-        fig.suptitle(f"Układ RLC", fontsize="x-large")
+        fig.suptitle(f"Układ RLC | dt = {dt}", fontsize="x-large")
 
         ymin, ymax = (min(*systemEvolution1[0], *systemEvolution1[1], *systemEvolution2[0], *systemEvolution2[1]),
                       max(*systemEvolution1[0], *systemEvolution1[1], *systemEvolution2[0], *systemEvolution2[1]))
@@ -83,5 +107,10 @@ class Printer:
         ax[1].plot(systemEvolution2[0], "darkred", label="Q(t)")
         ax[1].plot(systemEvolution2[1], "cornflowerblue", label="I(t)")
 
+        ticks = np.linspace(0, len(systemEvolution1[0]), 5)
+        ax[0].set_xticks(ticks)
+        ax[0].set_xticklabels(np.round(ticks / (1 / dt)))
+        ax[1].set_xticks(ticks)
+        ax[1].set_xticklabels(np.round(ticks / (1 / dt)))
         plt.legend()
         plt.show()
