@@ -1,5 +1,3 @@
-from typing import Tuple, Any
-
 import sympy as sp
 import numpy as np
 from scipy.integrate import odeint
@@ -57,15 +55,16 @@ class DynamicModel:
     class ErrorCalculator:
         @staticmethod
         def MAE(tseries1, tseries2):
-            return ((sum(abs(tseries1[0] - tseries2[0])) / len(tseries1) +
-                     sum(abs(tseries1[1] - tseries2[1])) / len(tseries1))
-                    .evalf(5))
+            summation = 0
+            for i in range(len(tseries1[0])):
+                summation += (abs(tseries1[0][i] - tseries2[0][i]).evalf(5) +
+                              abs(tseries1[1][i] - tseries2[1][i]).evalf(5))
+            return summation/len(tseries1[0])
 
         @staticmethod
         def MAEplot(tseries1, tseries2):
-            result = []
-            for i in range(len(tseries1[0])):
-                result.append(abs(tseries1[0][i] - tseries2[0][i]).evalf(3))
+            result = [(abs(tseries1[0][i] - tseries2[0][i]) + abs(tseries1[1][i] - tseries2[1][i])).evalf(3)
+                      for i in range(len(tseries1[0]))]
             for i in range(1, len(tseries1[0])):
                 result[i] += result[i - 1]
             for i in range(1, len(tseries1[0])):
@@ -74,15 +73,16 @@ class DynamicModel:
 
         @staticmethod
         def MSE(tseries1, tseries2):
-            return ((sum((tseries1[0] - tseries2[0]) ** 2) / len(tseries1) +
-                     sum((tseries1[1] - tseries2[1]) ** 2) / len(tseries1))
-                    .evalf(5))
+            summation = 0
+            for i in range(len(tseries1[0])):
+                summation += (((tseries1[0][i] - tseries2[0][i]) ** 2).evalf(5) +
+                              ((tseries1[1][i] - tseries2[1][i]) ** 2).evalf(5))
+            return summation/len(tseries1[0])
 
         @staticmethod
         def MSEplot(tseries1, tseries2):
-            result = []
-            for i in range(len(tseries1[0])):
-                result.append(((tseries1[0][i] - tseries2[0][i]) ** 2).evalf(3))
+            result = [((tseries1[0][i] - tseries2[0][i]) ** 2 + (tseries1[1][i] - tseries2[1][i]) ** 2).evalf(3)
+                      for i in range(len(tseries1[0]))]
             for i in range(1, len(tseries1[0])):
                 result[i] += result[i - 1]
             for i in range(1, len(tseries1[0])):
