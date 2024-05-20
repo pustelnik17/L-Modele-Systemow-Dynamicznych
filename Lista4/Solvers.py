@@ -92,7 +92,7 @@ class DynamicModel:
 
 class Printer:
     @staticmethod
-    def print(systemEvolution1, systemEvolution2, dt):
+    def signal(systemEvolution1, systemEvolution2, dt):
         fig, ax = plt.subplots(1, 2)
         fig.suptitle(f"Układ RLC | dt = {dt}", fontsize="x-large")
 
@@ -102,15 +102,38 @@ class Printer:
         ax[0].set_ylim([ymin, ymax])
         ax[1].set_ylim([ymin, ymax])
 
-        ax[0].plot(systemEvolution1[0], "red", label="Q(t)")
-        ax[0].plot(systemEvolution1[1], "blue", label="I(t)")
-        ax[1].plot(systemEvolution2[0], "darkred", label="Q(t)")
-        ax[1].plot(systemEvolution2[1], "cornflowerblue", label="I(t)")
+        ax[0].plot(systemEvolution1[0], "red", label="SYMPY Q(t)")
+        ax[0].plot(systemEvolution1[1], "blue", label="SYMPY I(t)")
+        ax[1].plot(systemEvolution2[0], "darkred", label="ODEINT Q(t)")
+        ax[1].plot(systemEvolution2[1], "cornflowerblue", label="ODEINT I(t)")
 
         ticks = np.linspace(0, len(systemEvolution1[0]), 5)
         ax[0].set_xticks(ticks)
         ax[0].set_xticklabels(np.round(ticks / (1 / dt)))
         ax[1].set_xticks(ticks)
         ax[1].set_xticklabels(np.round(ticks / (1 / dt)))
-        plt.legend()
+
+        lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+        lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+        fig.legend(lines, labels)
+        plt.show()
+
+    @staticmethod
+    def dependency(systemEvolution1, systemEvolution2, dt):
+        fig, ax = plt.subplots(1, 2)
+        fig.suptitle(f"Układ RLC | dt = {dt}", fontsize="x-large")
+
+        ymin, ymax = (min(*systemEvolution1[0], *systemEvolution1[1], *systemEvolution2[0], *systemEvolution2[1]),
+                      max(*systemEvolution1[0], *systemEvolution1[1], *systemEvolution2[0], *systemEvolution2[1]))
+
+        ax[0].set_ylim([ymin, ymax])
+        ax[1].set_ylim([ymin, ymax])
+
+        ax[0].plot(systemEvolution1[0], systemEvolution1[1], "red", label="SYMPY Q(I)")
+        ax[1].plot(systemEvolution2[0], systemEvolution2[1], "darkred", label="ODEINT Q(I)")
+
+        lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+        lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+        fig.legend(lines, labels)
+
         plt.show()
